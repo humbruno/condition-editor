@@ -5,8 +5,11 @@ import FilterProvider from './context/FilterContext';
 function App() {
   return (
     <FilterProvider>
-      <Filter />
-      <ProductsTable />
+      <main className="container">
+        <h1>Condition Editor</h1>
+        <Filter />
+        <ProductsTable />
+      </main>
     </FilterProvider>
   );
 }

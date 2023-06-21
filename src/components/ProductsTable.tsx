@@ -7,14 +7,13 @@ const ProductsTable = () => {
   const { filteredProducts } = useContext(FilterContext);
 
   return (
-    <table>
+    <table className="table">
       <thead>
         <tr>
           {properties.map((property) => (
             <th
               style={{
                 width: `calc(100% / ${properties.length})`,
-                border: '1px solid red',
               }}
               key={property.id}
             >
@@ -26,14 +25,12 @@ const ProductsTable = () => {
       <tbody>
         {filteredProducts.map((product: Product) => (
           <tr key={product.id}>
-            {product.property_values.map((propertyValue, index) => (
+            {product.property_values.map((propertyValue) => (
               <td
                 style={{
-                  textAlign: 'center',
                   width: `calc(100% / ${properties.length})`,
-                  border: '1px solid blue',
                 }}
-                key={index}
+                key={propertyValue.property_id}
               >
                 {propertyValue.value}
               </td>

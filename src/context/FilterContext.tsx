@@ -4,19 +4,21 @@ import {
   type Operator,
   type Property,
   PropertyType,
+  Product,
 } from '../types';
 import { operators, products, properties } from '../store';
+import validateOperator from '../validatons/validateOperator';
 
 interface ContextProps {
   propertyFilter: Property | undefined;
   setPropertyFilter: React.Dispatch<React.SetStateAction<Property | undefined>>;
   operatorFilter: Operator | undefined;
   setOperatorFilter: React.Dispatch<React.SetStateAction<Operator | undefined>>;
-  handleFilterSubmit: (e: any) => void;
-  filterValue: any;
-  setFilterValue: React.Dispatch<React.SetStateAction<any>>;
-  filteredProducts: any;
-  setFilteredProducts: any;
+  handleFilterSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  filterValue: string | string[];
+  setFilterValue: React.Dispatch<React.SetStateAction<string | string[]>>;
+  filteredProducts: Product[];
+  setFilteredProducts: React.Dispatch<React.SetStateAction<Product[]>>;
 }
 
 export const FilterContext = createContext<ContextProps>({
@@ -38,10 +40,10 @@ const FilterProvider = ({ children }: { children: ReactNode }) => {
   const [operatorFilter, setOperatorFilter] = useState<Operator | undefined>(
     undefined
   );
-  const [filterValue, setFilterValue] = useState<any>('');
-  const [filteredProducts, setFilteredProducts] = useState<any>(products);
+  const [filterValue, setFilterValue] = useState<string | string[]>('');
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>(products);
 
-  function handleFilterSubmit(e: any) {
+  function handleFilterSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     const filtered = products.filter((product) => {
@@ -59,38 +61,7 @@ const FilterProvider = ({ children }: { children: ReactNode }) => {
         return false;
       }
 
-      switch (operator.id) {
-        case OperatorId.EQUALS:
-          return property.type !== PropertyType.ENUM
-            ? propertyValue?.value.toString().toLowerCase() ===
-                filterValue.toLowerCase()
-            : propertyValue?.value.toString().toLowerCase() ===
-                filterValue.id.toLowerCase();
-        case OperatorId.GREATER_THAN:
-          return Number(propertyValue?.value) > Number(filterValue);
-        case OperatorId.LESS_THAN:
-          return Number(propertyValue?.value) < Number(filterValue);
-        case OperatorId.ANY:
-          return propertyValue;
-        case OperatorId.NONE:
-          return !propertyValue;
-        case OperatorId.ANY_OF:
-          return property.type !== PropertyType.ENUM
-            ? filterValue
-                .split(',')
-                .includes(propertyValue?.value.toString().toLowerCase())
-            : filterValue.some(
-                (item: { id: string; value: string; label: string }) =>
-                  item.value === propertyValue?.value
-              );
-        case OperatorId.CONTAINS:
-          return String(propertyValue?.value)
-            .toLowerCase()
-            .includes(String(filterValue).toLowerCase());
-
-        default:
-          return false;
-      }
+      validateOperator({ operator, filterValue, property, propertyValue });
     });
 
     setFilteredProducts(filtered);

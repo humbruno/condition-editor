@@ -67,20 +67,34 @@ const Filter = () => {
   }
 
   return (
-    <form onSubmit={handleFilterSubmit}>
-      <label>
-        Property
-        <Select onChange={handlePropertyChange} options={propertyOptions} />
-      </label>
+    <form className="form" onSubmit={handleFilterSubmit}>
+      <Select
+        placeholder="Select a Property"
+        onChange={handlePropertyChange}
+        options={propertyOptions}
+        styles={{
+          control: (baseStyles) => ({
+            ...baseStyles,
+            textTransform: 'capitalize',
+            minWidth: '150px',
+          }),
+          option: (baseStyles) => ({
+            ...baseStyles,
+            textTransform: 'capitalize',
+          }),
+        }}
+      />
       {shouldShowOperatorDropdown && (
-        <label>
-          Operator
-          <Select onChange={handleOperatorChange} options={operatorOptions} />
-        </label>
+        <Select
+          placeholder="Select an Operator"
+          onChange={handleOperatorChange}
+          options={operatorOptions}
+        />
       )}
       {shouldRenderInput &&
         (propertyFilter?.type !== PropertyType.ENUM ? (
           <input
+            placeholder="Value"
             onChange={(e) => setFilterValue(e.target.value)}
             type={input.inputType}
           />
@@ -91,12 +105,12 @@ const Filter = () => {
             isMulti={isMultiSelectInput}
           />
         ))}
-      <div>
+      <div className="btnWrapper">
         <button disabled={!propertyFilter || !operatorFilter} type="submit">
-          filter
+          Apply Filter
         </button>
         <button type="button" onClick={handleClearForm}>
-          clear
+          Clear Filter
         </button>
       </div>
     </form>

@@ -1,4 +1,4 @@
-type PropertyValue = {
+export type PropertyValue = {
   property_id: number;
   value: string | number;
 };
