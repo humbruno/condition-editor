@@ -1,13 +1,13 @@
 import { useState, createContext, type ReactNode } from 'react';
 import {
-  OperatorId,
   type Operator,
   type Property,
-  PropertyType,
   Product,
+  EnumeratedFilterValue,
 } from '../types';
 import { operators, products, properties } from '../store';
 import validateOperator from '../validatons/validateOperator';
+import { MultiValue, SingleValue } from 'react-select';
 
 interface ContextProps {
   propertyFilter: Property | undefined;
@@ -15,8 +15,19 @@ interface ContextProps {
   operatorFilter: Operator | undefined;
   setOperatorFilter: React.Dispatch<React.SetStateAction<Operator | undefined>>;
   handleFilterSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-  filterValue: string | string[];
-  setFilterValue: React.Dispatch<React.SetStateAction<string | string[]>>;
+  filterValue:
+    | string
+    | string[]
+    | SingleValue<EnumeratedFilterValue>
+    | MultiValue<EnumeratedFilterValue>;
+  setFilterValue: React.Dispatch<
+    React.SetStateAction<
+      | string
+      | SingleValue<EnumeratedFilterValue>
+      | MultiValue<EnumeratedFilterValue>
+      | string[]
+    >
+  >;
   filteredProducts: Product[];
   setFilteredProducts: React.Dispatch<React.SetStateAction<Product[]>>;
 }
@@ -40,7 +51,12 @@ const FilterProvider = ({ children }: { children: ReactNode }) => {
   const [operatorFilter, setOperatorFilter] = useState<Operator | undefined>(
     undefined
   );
-  const [filterValue, setFilterValue] = useState<string | string[]>('');
+  const [filterValue, setFilterValue] = useState<
+    | string
+    | string[]
+    | SingleValue<EnumeratedFilterValue>
+    | MultiValue<EnumeratedFilterValue>
+  >('');
   const [filteredProducts, setFilteredProducts] = useState<Product[]>(products);
 
   function handleFilterSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -61,7 +77,12 @@ const FilterProvider = ({ children }: { children: ReactNode }) => {
         return false;
       }
 
-      validateOperator({ operator, filterValue, property, propertyValue });
+      return validateOperator({
+        filterValue,
+        operator,
+        property,
+        propertyValue,
+      });
     });
 
     setFilteredProducts(filtered);

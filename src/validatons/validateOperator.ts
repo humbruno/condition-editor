@@ -1,4 +1,6 @@
+import { MultiValue, SingleValue } from 'react-select';
 import {
+  EnumeratedFilterValue,
   Operator,
   OperatorId,
   Property,
@@ -10,7 +12,11 @@ interface Params {
   operator: Operator;
   property: Property;
   propertyValue: PropertyValue | undefined;
-  filterValue: string | string[];
+  filterValue:
+    | string
+    | string[]
+    | SingleValue<EnumeratedFilterValue>
+    | MultiValue<EnumeratedFilterValue>;
 }
 
 function validateOperator({
@@ -19,13 +25,22 @@ function validateOperator({
   propertyValue,
   filterValue,
 }: Params): boolean {
+  const isEnumerated = property.type === PropertyType.ENUM;
+
+  const propertyValueMatchesFilterValue =
+    String(propertyValue?.value).toLowerCase() ===
+    String(filterValue).toLowerCase();
+
+  const objFilterValue = filterValue as EnumeratedFilterValue;
+
+  const propertyValueMatchesFilterValueId =
+    String(propertyValue?.value).toLowerCase() === objFilterValue.id;
+
   switch (operator.id) {
     case OperatorId.EQUALS:
-      return property.type !== PropertyType.ENUM
-        ? propertyValue?.value.toString().toLowerCase() ===
-            filterValue.toLowerCase()
-        : propertyValue?.value.toString().toLowerCase() ===
-            filterValue.id.toLowerCase();
+      return !isEnumerated
+        ? propertyValueMatchesFilterValue
+        : propertyValueMatchesFilterValueId;
     case OperatorId.GREATER_THAN:
       return Number(propertyValue?.value) > Number(filterValue);
     case OperatorId.LESS_THAN:
@@ -35,14 +50,13 @@ function validateOperator({
     case OperatorId.NONE:
       return !propertyValue;
     case OperatorId.ANY_OF:
-      return property.type !== PropertyType.ENUM
+      return !isEnumerated && typeof filterValue === 'string'
         ? filterValue
             .split(',')
-            .includes(propertyValue?.value.toString().toLowerCase())
-        : filterValue.some(
-            (item: { id: string; value: string; label: string }) =>
-              item.value === propertyValue?.value
-          );
+            .includes(String(propertyValue?.value).toLowerCase())
+        : Array(filterValue).some((item: any) => {
+            item?.value === propertyValue?.value;
+          });
     case OperatorId.CONTAINS:
       return String(propertyValue?.value)
         .toLowerCase()

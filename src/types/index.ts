@@ -35,3 +35,9 @@ export enum OperatorId {
   ANY_OF = 'in',
   CONTAINS = 'contains',
 }
+
+export type EnumeratedFilterValue = {
+  id: string;
+  value: string;
+  label: string;
+};
