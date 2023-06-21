@@ -3,11 +3,7 @@ import type { Operator, OperatorId, Property } from '../types';
 import { operatorToPropertyMap } from '../utils';
 import formatOperatorToDropdownObject from '../utils/formatOperatorToDropdownObject';
 
-interface Props {
-  propertyFilter: Property | undefined;
-}
-
-const useFindPossibleOperators = ({ propertyFilter }: Props) => {
+const useFindPossibleOperators = (propertyFilter: Property | undefined) => {
   if (!propertyFilter) return null;
 
   const possibleIds: OperatorId[] = operatorToPropertyMap[propertyFilter.type];

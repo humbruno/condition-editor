@@ -1,8 +1,9 @@
+import { useContext } from 'react';
 import Select, { SingleValue } from 'react-select';
 import { properties } from '../store';
-import { Property } from '../types';
 import useFindPossibleOperators from '../hooks/useFindPossibleOperators';
 import formatPropertyToDropdownObject from '../utils/formatPropertyToDropdownObject';
+import { FilterContext } from '../context/FilterContext';
 
 type Option = {
   id: number;
@@ -10,14 +11,11 @@ type Option = {
   label: string;
 };
 
-interface Props {
-  propertyFilter: Property | undefined;
-  setPropertyFilter: React.Dispatch<React.SetStateAction<Property | undefined>>;
-}
+const Filter = () => {
+  const { propertyFilter, setPropertyFilter } = useContext(FilterContext);
 
-const Filter = ({ setPropertyFilter, propertyFilter }: Props) => {
   const propertyOptions = formatPropertyToDropdownObject(properties);
-  const operatorOptions = useFindPossibleOperators({ propertyFilter });
+  const operatorOptions = useFindPossibleOperators(propertyFilter);
   const shouldShowOperatorDropdown = propertyFilter && operatorOptions;
 
   function handlePropertyChange(e: SingleValue<Option>) {
