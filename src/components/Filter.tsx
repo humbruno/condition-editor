@@ -40,7 +40,7 @@ const Filter = () => {
     operatorFilter,
   });
 
-  const multiSelectOptions = useFindEnumeratedOptions(
+  const enumeratedOptions = useFindEnumeratedOptions(
     propertyFilter,
     operatorFilter
   );
@@ -101,7 +101,7 @@ const Filter = () => {
         ) : (
           <Select
             onChange={(e) => setFilterValue(e)}
-            options={multiSelectOptions}
+            options={enumeratedOptions}
             isMulti={isMultiSelectInput}
           />
         ))}

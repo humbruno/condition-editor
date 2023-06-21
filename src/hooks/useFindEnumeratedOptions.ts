@@ -14,7 +14,7 @@ const useFindEnumeratedOptions = (
     !OP_IDS.includes(operatorFilter?.id) ||
     propertyFilter.type !== PropertyType.ENUM
   )
-    return null;
+    return [];
 
   const property = properties.find((prop) => prop.id === propertyFilter?.id);
 
