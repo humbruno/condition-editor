@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useRef } from 'react';
 import Select, { SingleValue } from 'react-select';
 import { operators, products, properties } from '../store';
 import useFindPossibleOperators from '../hooks/useFindPossibleOperators';
@@ -31,6 +31,8 @@ const Filter = () => {
     setFilteredProducts,
   } = useContext(FilterContext);
 
+  const propertyRef = useRef(null);
+
   const propertyOptions = formatPropertyToDropdownObject(properties);
   const operatorOptions = useFindPossibleOperators(propertyFilter);
   const shouldShowOperatorDropdown = propertyFilter && operatorOptions;
@@ -61,6 +63,9 @@ const Filter = () => {
   }
 
   function handleClearForm() {
+    if (!propertyRef.current) return;
+
+    propertyRef.current.clearValue();
     setPropertyFilter(undefined);
     setOperatorFilter(undefined);
     setFilteredProducts(products);
@@ -70,6 +75,7 @@ const Filter = () => {
     <form className="form" onSubmit={handleFilterSubmit}>
       <Select
         placeholder="Select a Property"
+        ref={propertyRef}
         onChange={handlePropertyChange}
         options={propertyOptions}
         styles={{
