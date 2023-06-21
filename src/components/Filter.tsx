@@ -1,11 +1,12 @@
 import { useContext } from 'react';
 import Select, { SingleValue } from 'react-select';
-import { operators, properties } from '../store';
+import { operators, products, properties } from '../store';
 import useFindPossibleOperators from '../hooks/useFindPossibleOperators';
 import formatPropertyToDropdownObject from '../utils/formatPropertyToDropdownObject';
 import { FilterContext } from '../context/FilterContext';
-import { OperatorId } from '../types';
+import { OperatorId, PropertyType } from '../types';
 import useGetInputType from '../hooks/useGetInputType';
+import useFindEnumeratedOptions from '../hooks/useFindEnumeratedOptions';
 
 type PropertyOption = {
   id: number;
@@ -25,6 +26,9 @@ const Filter = () => {
     setPropertyFilter,
     setOperatorFilter,
     operatorFilter,
+    handleFilterSubmit,
+    setFilterValue,
+    setFilteredProducts,
   } = useContext(FilterContext);
 
   const propertyOptions = formatPropertyToDropdownObject(properties);
@@ -36,8 +40,15 @@ const Filter = () => {
     operatorFilter,
   });
 
+  const multiSelectOptions = useFindEnumeratedOptions(
+    propertyFilter,
+    operatorFilter
+  );
+
   const shouldRenderInput =
-    input && input.needsInput && input.inputType && operatorFilter;
+    input && input.needsInput && operatorFilter && input.inputType;
+
+  const isMultiSelectInput = operatorFilter?.id === OperatorId.ANY_OF;
 
   function handlePropertyChange(e: SingleValue<PropertyOption>) {
     const selectedProperty = properties.find((prop) => prop.id === e?.id);
@@ -49,8 +60,14 @@ const Filter = () => {
     setOperatorFilter(selectedOperator);
   }
 
+  function handleClearForm() {
+    setPropertyFilter(undefined);
+    setOperatorFilter(undefined);
+    setFilteredProducts(products);
+  }
+
   return (
-    <form>
+    <form onSubmit={handleFilterSubmit}>
       <label>
         Property
         <Select onChange={handlePropertyChange} options={propertyOptions} />
@@ -61,7 +78,27 @@ const Filter = () => {
           <Select onChange={handleOperatorChange} options={operatorOptions} />
         </label>
       )}
-      {shouldRenderInput && <input type={input.inputType} />}
+      {shouldRenderInput &&
+        (propertyFilter?.type !== PropertyType.ENUM ? (
+          <input
+            onChange={(e) => setFilterValue(e.target.value)}
+            type={input.inputType}
+          />
+        ) : (
+          <Select
+            onChange={(e) => setFilterValue(e)}
+            options={multiSelectOptions}
+            isMulti={isMultiSelectInput}
+          />
+        ))}
+      <div>
+        <button disabled={!propertyFilter || !operatorFilter} type="submit">
+          filter
+        </button>
+        <button type="button" onClick={handleClearForm}>
+          clear
+        </button>
+      </div>
     </form>
   );
 };
