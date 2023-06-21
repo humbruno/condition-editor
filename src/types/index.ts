@@ -8,18 +8,18 @@ export type Product = {
   property_values: PropertyValue[];
 };
 
+export enum PropertyType {
+  STRING = 'string',
+  NUMBER = 'number',
+  ENUM = 'enumerated',
+}
+
 export type Property = {
   id: number;
   name: string;
   type: PropertyType;
   values?: string[];
 };
-
-export enum PropertyType {
-  STRING = 'string',
-  NUMBER = 'number',
-  ENUM = 'enumerated',
-}
 
 export type Operator = {
   text: string;
