@@ -173,3 +173,74 @@ describe('NONE operator', () => {
     }
   );
 });
+
+describe('ANY operator', () => {
+  test.each(properties)(
+    'filters the table for items that have any of the values of the input',
+    async (property) => {
+      const { getByLabelText, getByTestId } = render(<App />);
+
+      const OPERATOR = findOperatorById(OperatorId.ANY_OF)?.text;
+      const tableRows = document.querySelectorAll('table tbody tr');
+      const submitButton = getByTestId('filter-btn');
+
+      const propertyValue = PRODUCT.property_values.find(
+        (value) => value.property_id === property?.id
+      );
+
+      if (!propertyValue || !OPERATOR) return;
+
+      await selectEvent.select(getByLabelText('Properties'), property.name);
+      await selectEvent.select(getByLabelText('Operator'), OPERATOR);
+
+      if (property.type !== PropertyType.ENUM) {
+        const input = getByTestId('input');
+        fireEvent.change(input, { target: { value: propertyValue } });
+        fireEvent(submitButton, new MouseEvent('click'));
+      } else {
+        await selectEvent.select(
+          getByLabelText('Value'),
+          property.values ? property.values[0] : ''
+        );
+      }
+
+      expect(tableRows[0]).toHaveTextContent(String(propertyValue.value));
+    }
+  );
+});
+
+describe('CONTAINS operator', () => {
+  test.each(properties)(
+    'filters the table for items that contain the whole input or part of it',
+    async (property) => {
+      if (property.type !== PropertyType.STRING) return;
+
+      const { getByLabelText, getByTestId } = render(<App />);
+
+      const OPERATOR = findOperatorById(OperatorId.CONTAINS)?.text;
+      const tableRows = document.querySelectorAll('table tbody tr');
+      const submitButton = getByTestId('filter-btn');
+
+      const propertyValue = PRODUCT.property_values.find(
+        (value) => value.property_id === property?.id
+      );
+
+      if (!propertyValue || !OPERATOR) return;
+
+      await selectEvent.select(getByLabelText('Properties'), property.name);
+      await selectEvent.select(getByLabelText('Operator'), OPERATOR);
+
+      const input = getByTestId('input');
+
+      const partialValue = String(propertyValue.value).slice(1);
+
+      fireEvent.change(input, {
+        target: { value: partialValue },
+      });
+
+      fireEvent(submitButton, new MouseEvent('click'));
+
+      expect(tableRows[0]).toHaveTextContent(partialValue);
+    }
+  );
+});
