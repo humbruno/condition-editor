@@ -41,3 +41,15 @@ export type EnumeratedFilterValue = {
   value: string;
   label: string;
 };
+
+export type PropertyOption = {
+  id: number;
+  value: string;
+  label: string;
+};
+
+export type OperatorOption = {
+  id: OperatorId;
+  value: string;
+  label: string;
+};

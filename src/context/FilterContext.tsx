@@ -5,6 +5,8 @@ import {
   Product,
   EnumeratedFilterValue,
   OperatorId,
+  PropertyOption,
+  OperatorOption,
 } from '../types';
 import { products } from '../store';
 import validateOperator from '../validatons/validateOperator';
@@ -18,7 +20,7 @@ interface ContextProps {
   setPropertyFilter: React.Dispatch<React.SetStateAction<Property | undefined>>;
   operatorFilter: Operator | undefined;
   setOperatorFilter: React.Dispatch<React.SetStateAction<Operator | undefined>>;
-  handleFilterSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  submitFilter: (e: React.FormEvent<HTMLFormElement>) => void;
   filterValue:
     | string
     | string[]
@@ -34,6 +36,9 @@ interface ContextProps {
   >;
   filteredProducts: Product[];
   setFilteredProducts: React.Dispatch<React.SetStateAction<Product[]>>;
+  changeProperty: (e: SingleValue<PropertyOption>, ...rest: any[]) => void;
+  changeOperator: (e: SingleValue<OperatorOption>, ...rest: any[]) => void;
+  clearFilter: (..._rest: any) => void;
 }
 
 export const FilterContext = createContext<ContextProps>({
@@ -41,11 +46,14 @@ export const FilterContext = createContext<ContextProps>({
   setPropertyFilter: () => null,
   operatorFilter: undefined,
   setOperatorFilter: () => null,
-  handleFilterSubmit: () => null,
+  submitFilter: () => null,
   filterValue: '',
   setFilterValue: () => null,
   filteredProducts: products,
   setFilteredProducts: () => null,
+  changeProperty: () => null,
+  changeOperator: () => null,
+  clearFilter: () => null,
 });
 
 const FilterProvider = ({ children }: { children: ReactNode }) => {
@@ -63,7 +71,30 @@ const FilterProvider = ({ children }: { children: ReactNode }) => {
   >('');
   const [filteredProducts, setFilteredProducts] = useState<Product[]>(products);
 
-  function handleFilterSubmit(e: React.FormEvent<HTMLFormElement>) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  function changeProperty(e: SingleValue<PropertyOption>, ..._rest: any) {
+    const selectedProperty = findPropertyById(e?.id as number);
+    setPropertyFilter(selectedProperty);
+    setOperatorFilter(undefined);
+    setFilterValue('');
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  function changeOperator(e: SingleValue<OperatorOption>, ..._rest: any) {
+    const selectedOperator = findOperatorById(e?.id as OperatorId);
+    setOperatorFilter(selectedOperator);
+    setFilterValue('');
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  function clearFilter(..._rest: any) {
+    setPropertyFilter(undefined);
+    setFilterValue('');
+    setOperatorFilter(undefined);
+    setFilteredProducts(products);
+  }
+
+  function submitFilter(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     const filtered = products.filter((product) => {
@@ -94,11 +125,14 @@ const FilterProvider = ({ children }: { children: ReactNode }) => {
     setPropertyFilter,
     operatorFilter,
     setOperatorFilter,
-    handleFilterSubmit,
+    submitFilter,
     filterValue,
     setFilterValue,
     filteredProducts,
     setFilteredProducts,
+    changeProperty,
+    changeOperator,
+    clearFilter,
   };
 
   return (

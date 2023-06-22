@@ -1,6 +1,6 @@
 import { useContext, useRef } from 'react';
-import Select, { SingleValue } from 'react-select';
-import { operators, products, properties } from '../store';
+import Select from 'react-select';
+import { properties } from '../store';
 import useFindPossibleOperators from '../hooks/useFindPossibleOperators';
 import formatPropertyToDropdownObject from '../utils/formatPropertyToDropdownObject';
 import { FilterContext } from '../context/FilterContext';
@@ -8,33 +8,21 @@ import { OperatorId, PropertyType } from '../types';
 import useGetInputType from '../hooks/useGetInputType';
 import useFindEnumeratedOptions from '../hooks/useFindEnumeratedOptions';
 
-type PropertyOption = {
-  id: number;
-  value: string;
-  label: string;
-};
-
-type OperatorOption = {
-  id: OperatorId;
-  value: string;
-  label: string;
-};
-
 const Filter = () => {
   const {
     propertyFilter,
-    setPropertyFilter,
-    setOperatorFilter,
     operatorFilter,
-    handleFilterSubmit,
+    submitFilter,
     setFilterValue,
-    setFilteredProducts,
+    changeProperty,
+    changeOperator,
+    clearFilter,
   } = useContext(FilterContext);
 
   const propertyRef = useRef(null);
   const valueSelectRef = useRef(null);
   const operatorRef = useRef(null);
-  const inputRef = useRef(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const propertyOptions = formatPropertyToDropdownObject(properties);
   const operatorOptions = useFindPossibleOperators(propertyFilter);
@@ -60,35 +48,13 @@ const Filter = () => {
     return ref.current.clearValue();
   }
 
-  function handlePropertyChange(e: SingleValue<PropertyOption>) {
-    const selectedProperty = properties.find((prop) => prop.id === e?.id);
-    setPropertyFilter(selectedProperty);
-
-    clearSelect(operatorRef);
-    clearSelect(valueSelectRef);
-    setOperatorFilter(undefined);
-    setFilterValue('');
-  }
-
-  function handleOperatorChange(e: SingleValue<OperatorOption>) {
-    const selectedOperator = operators.find((op) => op.id === e?.id);
-    setOperatorFilter(selectedOperator);
-
-    clearSelect(valueSelectRef);
-    if (inputRef.current) inputRef.current.value = '';
-    setFilterValue('');
-  }
-
-  function handleClearForm() {
-    clearSelect(propertyRef);
-    setPropertyFilter(undefined);
-    setFilterValue('');
-    setOperatorFilter(undefined);
-    setFilteredProducts(products);
+  function clearInput() {
+    if (!inputRef.current) return;
+    inputRef.current.value = '';
   }
 
   return (
-    <form className="form" onSubmit={handleFilterSubmit}>
+    <form className="form" onSubmit={submitFilter}>
       <label hidden htmlFor="properties">
         Properties
       </label>
@@ -97,7 +63,13 @@ const Filter = () => {
         inputId="properties"
         placeholder="Select a Property"
         ref={propertyRef}
-        onChange={handlePropertyChange}
+        onChange={(e) =>
+          changeProperty(
+            e,
+            clearSelect(operatorRef),
+            clearSelect(valueSelectRef)
+          )
+        }
         options={propertyOptions}
         styles={{
           control: (baseStyles) => ({
@@ -122,11 +94,14 @@ const Filter = () => {
             name="operator"
             inputId="operator"
             placeholder="Select an Operator"
-            onChange={handleOperatorChange}
+            onChange={(e) =>
+              changeOperator(e, clearSelect(valueSelectRef), clearInput())
+            }
             options={operatorOptions}
           />
         </>
       )}
+
       {shouldRenderInput &&
         (propertyFilter?.type !== PropertyType.ENUM ? (
           <input
@@ -159,7 +134,10 @@ const Filter = () => {
         >
           Apply Filter
         </button>
-        <button type="button" onClick={handleClearForm}>
+        <button
+          type="button"
+          onClick={() => clearFilter(clearSelect(propertyRef))}
+        >
           Clear Filter
         </button>
       </div>
