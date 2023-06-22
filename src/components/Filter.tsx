@@ -73,7 +73,12 @@ const Filter = () => {
 
   return (
     <form className="form" onSubmit={handleFilterSubmit}>
+      <label hidden htmlFor="properties">
+        Properties
+      </label>
       <Select
+        name="properties"
+        inputId="properties"
         placeholder="Select a Property"
         ref={propertyRef}
         onChange={handlePropertyChange}
@@ -90,29 +95,49 @@ const Filter = () => {
           }),
         }}
       />
+
       {shouldShowOperatorDropdown && (
-        <Select
-          placeholder="Select an Operator"
-          onChange={handleOperatorChange}
-          options={operatorOptions}
-        />
+        <>
+          <label hidden htmlFor="operator">
+            Operator
+          </label>
+          <Select
+            name="operator"
+            inputId="operator"
+            placeholder="Select an Operator"
+            onChange={handleOperatorChange}
+            options={operatorOptions}
+          />
+        </>
       )}
       {shouldRenderInput &&
         (propertyFilter?.type !== PropertyType.ENUM ? (
           <input
+            data-testid="input"
             placeholder="Value"
             onChange={(e) => setFilterValue(e.target.value)}
             type={input.inputType}
           />
         ) : (
-          <Select
-            onChange={(e) => setFilterValue(e)}
-            options={enumeratedOptions}
-            isMulti={isMultiSelectInput}
-          />
+          <>
+            <label hidden htmlFor="value">
+              Value
+            </label>
+            <Select
+              name="value"
+              inputId="value"
+              onChange={(e) => setFilterValue(e)}
+              options={enumeratedOptions}
+              isMulti={isMultiSelectInput}
+            />
+          </>
         ))}
       <div className="btnWrapper">
-        <button disabled={!propertyFilter || !operatorFilter} type="submit">
+        <button
+          data-testid="filter-btn"
+          disabled={!propertyFilter || !operatorFilter}
+          type="submit"
+        >
           Apply Filter
         </button>
         <button type="button" onClick={handleClearForm}>

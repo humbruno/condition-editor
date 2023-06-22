@@ -7,7 +7,7 @@ const ProductsTable = () => {
   const { filteredProducts } = useContext(FilterContext);
 
   return (
-    <table className="table">
+    <table data-testid="table" className="table">
       <thead>
         <tr>
           {properties.map((property) => (
