@@ -34,7 +34,7 @@ h1::before {
   left: -3%;
   bottom: 12px;
   height: 8px;
-  width: 110%;
+  width: 106%;
   z-index: -1;
   border-radius: 35px;
 }

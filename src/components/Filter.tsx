@@ -32,6 +32,8 @@ const Filter = () => {
   } = useContext(FilterContext);
 
   const propertyRef = useRef(null);
+  const valueSelectRef = useRef(null);
+  const operatorRef = useRef(null);
 
   const propertyOptions = formatPropertyToDropdownObject(properties);
   const operatorOptions = useFindPossibleOperators(propertyFilter);
@@ -55,11 +57,26 @@ const Filter = () => {
   function handlePropertyChange(e: SingleValue<PropertyOption>) {
     const selectedProperty = properties.find((prop) => prop.id === e?.id);
     setPropertyFilter(selectedProperty);
+
+    if (operatorRef.current) {
+      operatorRef.current.clearValue();
+      setOperatorFilter(undefined);
+    }
+
+    if (valueSelectRef.current) {
+      valueSelectRef.current.clearValue();
+      setFilterValue('');
+    }
   }
 
   function handleOperatorChange(e: SingleValue<OperatorOption>) {
     const selectedOperator = operators.find((op) => op.id === e?.id);
     setOperatorFilter(selectedOperator);
+
+    if (valueSelectRef.current) {
+      valueSelectRef.current.clearValue();
+      setFilterValue('');
+    }
   }
 
   function handleClearForm() {
@@ -67,6 +84,7 @@ const Filter = () => {
 
     propertyRef.current.clearValue();
     setPropertyFilter(undefined);
+    setFilterValue('');
     setOperatorFilter(undefined);
     setFilteredProducts(products);
   }
@@ -102,6 +120,7 @@ const Filter = () => {
             Operator
           </label>
           <Select
+            ref={operatorRef}
             name="operator"
             inputId="operator"
             placeholder="Select an Operator"
@@ -124,6 +143,7 @@ const Filter = () => {
               Value
             </label>
             <Select
+              ref={valueSelectRef}
               name="value"
               inputId="value"
               onChange={(e) => setFilterValue(e)}

@@ -54,8 +54,8 @@ function validateOperator({
         ? filterValue
             .split(',')
             .includes(String(propertyValue?.value).toLowerCase())
-        : Array(filterValue).some((item: any) => {
-            item?.value === propertyValue?.value;
+        : Array.from(filterValue as string[]).some((item: any) => {
+            return String(item?.value) === String(propertyValue?.value);
           });
     case OperatorId.CONTAINS:
       return String(propertyValue?.value)
