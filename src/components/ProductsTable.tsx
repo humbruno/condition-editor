@@ -35,6 +35,7 @@ const ProductsTable = () => {
                 {propertyValue.value}
               </td>
             ))}
+            {product.property_values.length < properties.length && <td />}
           </tr>
         ))}
       </tbody>
