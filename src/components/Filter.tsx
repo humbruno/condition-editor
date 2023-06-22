@@ -34,6 +34,7 @@ const Filter = () => {
   const propertyRef = useRef(null);
   const valueSelectRef = useRef(null);
   const operatorRef = useRef(null);
+  const inputRef = useRef(null);
 
   const propertyOptions = formatPropertyToDropdownObject(properties);
   const operatorOptions = useFindPossibleOperators(propertyFilter);
@@ -54,35 +55,32 @@ const Filter = () => {
 
   const isMultiSelectInput = operatorFilter?.id === OperatorId.ANY_OF;
 
+  function clearSelect(ref: React.MutableRefObject<null>) {
+    if (!ref.current) return;
+    return ref.current.clearValue();
+  }
+
   function handlePropertyChange(e: SingleValue<PropertyOption>) {
     const selectedProperty = properties.find((prop) => prop.id === e?.id);
     setPropertyFilter(selectedProperty);
 
-    if (operatorRef.current) {
-      operatorRef.current.clearValue();
-      setOperatorFilter(undefined);
-    }
-
-    if (valueSelectRef.current) {
-      valueSelectRef.current.clearValue();
-      setFilterValue('');
-    }
+    clearSelect(operatorRef);
+    clearSelect(valueSelectRef);
+    setOperatorFilter(undefined);
+    setFilterValue('');
   }
 
   function handleOperatorChange(e: SingleValue<OperatorOption>) {
     const selectedOperator = operators.find((op) => op.id === e?.id);
     setOperatorFilter(selectedOperator);
 
-    if (valueSelectRef.current) {
-      valueSelectRef.current.clearValue();
-      setFilterValue('');
-    }
+    clearSelect(valueSelectRef);
+    if (inputRef.current) inputRef.current.value = '';
+    setFilterValue('');
   }
 
   function handleClearForm() {
-    if (!propertyRef.current) return;
-
-    propertyRef.current.clearValue();
+    clearSelect(propertyRef);
     setPropertyFilter(undefined);
     setFilterValue('');
     setOperatorFilter(undefined);
@@ -132,6 +130,7 @@ const Filter = () => {
       {shouldRenderInput &&
         (propertyFilter?.type !== PropertyType.ENUM ? (
           <input
+            ref={inputRef}
             data-testid="input"
             placeholder="Value"
             onChange={(e) => setFilterValue(e.target.value)}

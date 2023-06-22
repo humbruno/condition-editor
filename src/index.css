@@ -71,6 +71,7 @@ button:disabled {
   padding: 0 20px 20px 20px;
   border-bottom-left-radius: 8px;
   border-bottom-right-radius: 8px;
+  word-break: break-all;
 }
 
 th {
@@ -121,4 +122,26 @@ option {
   padding: 4px;
   border: none;
   font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+  main {
+    padding: 10px;
+  }
+
+  .form {
+    flex-direction: column;
+  }
+
+  h1 {
+    font-size: 1.75rem;
+  }
+
+  h1::before {
+    bottom: 8px;
+  }
+
+  .table {
+    font-size: 0.875rem;
+  }
 }

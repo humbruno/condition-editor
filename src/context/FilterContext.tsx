@@ -4,10 +4,14 @@ import {
   type Property,
   Product,
   EnumeratedFilterValue,
+  OperatorId,
 } from '../types';
-import { operators, products, properties } from '../store';
+import { products } from '../store';
 import validateOperator from '../validatons/validateOperator';
 import { MultiValue, SingleValue } from 'react-select';
+import findOperatorById from '../utils/findOperatorById';
+import findPropertyById from '../utils/findPropertyById';
+import findPropertyValueByPropertyId from '../utils/findPropertyValueByPropertyId';
 
 interface ContextProps {
   propertyFilter: Property | undefined;
@@ -63,15 +67,12 @@ const FilterProvider = ({ children }: { children: ReactNode }) => {
     e.preventDefault();
 
     const filtered = products.filter((product) => {
-      const property = properties.find(
-        (prop) => prop.id === propertyFilter?.id
-      );
-
-      const operator = operators.find((op) => op.id === operatorFilter?.id);
-
-      const propertyValue = product.property_values.find(
-        (value) => value.property_id === property?.id
-      );
+      const property = findPropertyById(propertyFilter?.id as number);
+      const operator = findOperatorById(operatorFilter?.id as OperatorId);
+      const propertyValue = findPropertyValueByPropertyId({
+        product,
+        propertyId: property?.id as number,
+      });
 
       if (!property || !operator) {
         return false;
