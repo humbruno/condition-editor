@@ -9,6 +9,12 @@ jobs:
   tests:
     runs-on: ubuntu-latest
 
+    permissions:
+      # Required to checkout the code
+      contents: read
+      # Required to put a comment into the pull-request
+      pull-requests: write
+
     steps:
       - name: Setup Node
         uses: actions/setup-node@v3
