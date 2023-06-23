@@ -25,6 +25,6 @@ jobs:
       - name: Build & Deploy
         run: |
           git config --global user.email ${{ secrets.MY_EMAIL }}
-          git config --global user.name ${{ secrets.MY_NAMEL }}
-          git remote set-url origin https://${{ secrets.MY_EMAIL }}:${{ secrets.MY_PASSWORD }}@github.com/your_name/your_repository.git
+          git config --global user.name ${{ secrets.MY_NAME }}
+          git remote set-url origin https://${{ secrets.MY_EMAIL }}:${{ secrets.MY_PASSWORD }}@github.com/humbruno/condition-editor.git
           npm run deploy
