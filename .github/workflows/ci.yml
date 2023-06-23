@@ -23,4 +23,8 @@ jobs:
         run: npm ci
 
       - name: Build & Deploy
-        run: git config --global user.email $MY_EMAIL git config --global user.name $MY_NAME git remote set-url origin https://$MY_NAME:${{ secrets.MY_PASSWORD }}@github.com/your_name/your_repository.git npm run deploy
+        run: |
+          git config --global user.email ${{ secrets.MY_EMAIL }}
+          git config --global user.name ${{ secrets.MY_NAMEL }}
+          git remote set-url origin https://${{ secrets.MY_EMAIL }}:${{ secrets.MY_PASSWORD }}@github.com/your_name/your_repository.git
+          npm run deploy
